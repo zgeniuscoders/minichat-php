@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "dev": "postcss build ./dist/css/app.css -o ./public/css/app.css",
+    "watch": "postcss build ./dist/css/app.css -o ./public/css/app.css --watch"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.8",
+    "postcss": "^8.4.16",
+    "postcss-cli": "^10.0.0",
+    "tailwindcss": "^3.1.8"
+  }
+}
