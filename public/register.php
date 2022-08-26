@@ -3,43 +3,43 @@
 $errors = [];
 
 if ($_POST) {
-    extract($_POST);
-    if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors["email"] = "Cette address email est invalid";
+    if (empty($_POST["email"]) || !filter_var($_POST["email"], FILTER_VALIDATE_EMAIL)) {
+        $errors["email"] = "cette adress email n'est  pas valide";
     }
 
-    if (empty($name) || !preg_match("/^[a-zA-Z]+$/", $name)) {
-        $errors["name"] = "Alphanumerique uniquement (aA-zZ)";
+    if (empty($_POST["name"]) || !preg_match("/^[a-zA-Z]+$/", $_POST["name"])) {
+        $errors["name"] = "Alphanumerique uniquemengt(a-zA-Z)";
+    }
+    if (empty($_POST["password"]) || strlen($_POST["password"]) < 6) {
+        $errors["password"] = "Le mot de pass doit contenir plus de 6 caracteres";
+    } else if ($_POST["password"] != $_POST["password_confirm"]) {
+        $errors["password_confirm"] = "Le mot de pass ne coprespond pas";
     }
 
-    if (strlen($password) < 6) {
-        $errors["password"] = "Le mot de passe doit contenir plus des 6 caracteres";
-    } else if ($password != $password_confirm) {
-        $errors["password-confirm"] = "Le mot de passe ne correspond pas";
-    }
+    if (empty($_FILES["picture"]["name"])) {
+        $errors["picture"] = "Cette est requis";
+    } else {
+        $fileName =  $_FILES["picture"]["name"];
+        $ext = "." . strtolower(substr(strchr($fileName, "."), 1));
+        $tmp = $_FILES["picture"]["tmp_name"];
+        $uunam = md5(uniqid(rand(), true));
+        $extAuth = [".jpg", ".png", ".jpeg", ".JPG", ".PNG", ".JPEG"];
 
-    if (!empty($_FILES["profile-picture"])) {
-        $maxSize = 20480;
-        $fileName = $_FILES["profile-picture"]["name"];
-        $fileSize = $_FILES["profile-picture"]["size"];
-        $ext = "." . strtolower(substr(strrchr($fileName, "."), 1));
-        $tmp = $_FILES["profile-picture"]["tmp_name"];
-        $uuname =  md5(uniqid(rand(), true));
-        $extAuthorize = [".jpg", ".png", ".JPG", ".PNG"];
-
-        if ($_FILES["profile-picture"]["error"] > 0) {
-            $errors["profile-picture"] = "la photo de profile na pu pas être uploader";
+        if ($_FILES["picture"]["error"] > 0) {
+            $errors["picture"] = "la photo napu être uploader";
         }
-        if (!in_array($ext, $extAuthorize)) {
-            $errors["profile-picture"] = "Extension de cette fichier n'est pas autorisé";
+
+        if (!in_array($ext, $extAuth)) {
+            $errors["picture"] = "cette extension n'est pas autoriser";
         }
     }
 }
 
+echo "<pre>" . var_dump($errors) . "</pre>";
+
 
 
 ?>
-
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -48,48 +48,38 @@ if ($_POST) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="./css/app.css" />
+    <link rel="stylesheet" href="./css/app.css">
 </head>
 
-<body class="bg-gray-800 text-gray-100">
-    <div class="flex h-screen items-center justify-center">
-        <form action="" method="post" class="bg-gray-100 p-4 text-gray-700" style="width: 450px;" enctype="multipart/form-data">
+<body>
+    <div class="flex items-center justify-center h-screen">
+        <form action="" method="post" class="bg-gray-100 shadow-md p-4 rounded" style="width: 450px;" enctype="multipart/form-data">
             <div class="my-2">
-                <label for="email" class="mb-2 block">Adresse email</label>
-                <input type="title" name="email" id="email" class="border-solid border-2 w-full outline-none p-2 rounded">
-                <?php if (isset($errors["email"])) : ?>
-                    <span class="text-red-300"><?= $errors["email"] ? $errors["email"] : '' ?></span>
-                <?php endif ?>
+                <label for="email">Email</label>
+                <input type="title" name="email" id="email" class="w-full border-solid border-2 border-gray-300 outline-none p-2 rounded">
+                <span class="text-red-400 mt-1 block">cette email est requis</span>
             </div>
             <div class="my-2">
-                <label for="name" class="mb-2 block">Pseudo</label>
-                <input type="title" name="name" id="name" class="border-solid border-2 w-full outline-none p-2 rounded">
-                <?php if (isset($errors["name"])) : ?>
-                    <span class="text-red-300"><?= $errors["name"] ? $errors["name"] : '' ?></span>
-                <?php endif ?>
+                <label for="name">Pseudo</label>
+                <input type="title" name="name" id="name" class="w-full border-solid border-2 border-gray-300 outline-none p-2 rounded">
+                <span class="text-red-400 mt-1 block">cette email est requis</span>
             </div>
             <div class="my-2">
-                <label for="password" class="mb-2 block">Mot de passe</label>
-                <input type="password" name="password" id="password" class="border-solid border-2 w-full outline-none p-2 rounded">
-                <?php if (isset($errors["password"])) : ?>
-                    <span class="text-red-300"><?= $errors["password"] ? $errors["password"] : '' ?></span>
-                <?php endif ?>
+                <label for="password">Mot de passe</label>
+                <input type="password" name="password" id="password" class="w-full border-solid border-2 border-gray-300 outline-none p-2 rounded">
+                <span class="text-red-400 mt-1 block">cette email est requis</span>
             </div>
             <div class="my-2">
-                <label for="password-confirm" class="mb-2 block">Confirmation du mot de passe</label>
-                <input type="password" name="password_confirm" id="password-confirm" class="border-solid border-2 w-full outline-none p-2 rounded">
-                <?php if (isset($errors["password-confirm"])) : ?>
-                    <span class="text-red-300"><?= $errors["password-confirm"] ? $errors["password-confirm"] : '' ?></span>
-                <?php endif ?>
+                <label for="password_confirm">Confirmation du mot de passe</label>
+                <input type="password" name="password_confirm" id="password_confirm" class="w-full border-solid border-2 border-gray-300 outline-none p-2 rounded">
+                <span class="text-red-400 mt-1 block">cette email est requis</span>
             </div>
             <div class="my-2">
-                <label for="profile-picture" class="mb-2 block">Photo du profil</label>
-                <input type="file" name="profile-picture" id="profile-picture" class="border-solid border-2 w-full outline-none p-2 rounded">
-                <?php if (isset($errors["profile-picture"])) : ?>
-                    <span class="text-red-300"><?= $errors["profile-picture"] ? $errors["profile-picture"] : '' ?></span>
-                <?php endif ?>
+                <label for="picture">Photo de profile</label>
+                <input type="file" name="picture" id="picture" class="w-full border-solid border-2 border-gray-300 outline-none p-2 rounded">
+                <span class="text-red-400 mt-1 block">cette email est requis</span>
             </div>
-            <button type="submit" class="block bg-blue-600 w-full text-gray-100 p-2 rounded">enregitrer</button>
+            <button type="submit" class="bg-blue-600 text-white w-full p-2 hover:bg-blue-500 rounded">enregistrer</button>
         </form>
     </div>
 </body>
