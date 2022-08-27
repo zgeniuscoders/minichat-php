@@ -33,9 +33,38 @@ if ($_POST) {
             $errors["picture"] = "cette extension n'est pas autoriser";
         }
     }
+
+    if(empty($errors))
+    {
+        require "./dbconnection.php";
+
+        $hash = password_hash($_POST["password"],PASSWORD_BCRYPT);
+        $file = $uunam . $ext;
+        $to = "./img" . DIRECTORY_SEPARATOR . $file;
+
+        $stmt = $pdo->prepare("INSERT INTO users(name,email,photo,password) VALUES(?,?,?,?)");
+        $stmt->execute([
+            $_POST["name"],
+            $_POST["email"],
+            $file,
+            $hash
+        ]);
+
+
+        if($stmt)
+        {
+            move_uploaded_file($tmp,$to);
+
+            $id = $pdo->lastInsertId();
+            $stmt = $pdo->query("SELECT * FROM users WHERE id = $id");
+            $user = $stmt->fetch();
+
+            $_SESSION["auth"] = $user;
+        }
+    }
 }
 
-echo "<pre>" . var_dump($errors) . "</pre>";
+
 
 
 
@@ -57,27 +86,37 @@ echo "<pre>" . var_dump($errors) . "</pre>";
             <div class="my-2">
                 <label for="email">Email</label>
                 <input type="title" name="email" id="email" class="w-full border-solid border-2 border-gray-300 outline-none p-2 rounded">
-                <span class="text-red-400 mt-1 block">cette email est requis</span>
+                <?php if(isset($errors["email"])): ?>
+                    <span class="text-red-400 mt-1 block"><?= $errors["email"] ?></span>
+                <?php endif; ?>    
             </div>
             <div class="my-2">
                 <label for="name">Pseudo</label>
                 <input type="title" name="name" id="name" class="w-full border-solid border-2 border-gray-300 outline-none p-2 rounded">
-                <span class="text-red-400 mt-1 block">cette email est requis</span>
+                <?php if(isset($errors["name"])): ?>
+                    <span class="text-red-400 mt-1 block"><?= $errors["name"] ?></span>
+                <?php endif; ?> 
             </div>
             <div class="my-2">
                 <label for="password">Mot de passe</label>
                 <input type="password" name="password" id="password" class="w-full border-solid border-2 border-gray-300 outline-none p-2 rounded">
-                <span class="text-red-400 mt-1 block">cette email est requis</span>
+                <?php if(isset($errors["password"])): ?>
+                    <span class="text-red-400 mt-1 block"><?= $errors["password"] ?></span>
+                <?php endif; ?> 
             </div>
             <div class="my-2">
                 <label for="password_confirm">Confirmation du mot de passe</label>
                 <input type="password" name="password_confirm" id="password_confirm" class="w-full border-solid border-2 border-gray-300 outline-none p-2 rounded">
-                <span class="text-red-400 mt-1 block">cette email est requis</span>
+                <?php if(isset($errors["password_confirm"])): ?>
+                    <span class="text-red-400 mt-1 block"><?= $errors["password_confirm"] ?></span>
+                <?php endif; ?> 
             </div>
             <div class="my-2">
                 <label for="picture">Photo de profile</label>
                 <input type="file" name="picture" id="picture" class="w-full border-solid border-2 border-gray-300 outline-none p-2 rounded">
-                <span class="text-red-400 mt-1 block">cette email est requis</span>
+                <?php if(isset($errors["picture"])): ?>
+                    <span class="text-red-400 mt-1 block"><?= $errors["picture"] ?></span>
+                <?php endif; ?> 
             </div>
             <button type="submit" class="bg-blue-600 text-white w-full p-2 hover:bg-blue-500 rounded">enregistrer</button>
         </form>
