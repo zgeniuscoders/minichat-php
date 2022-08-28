@@ -60,6 +60,8 @@ if ($_POST) {
             $user = $stmt->fetch();
 
             $_SESSION["auth"] = $user;
+
+            header("Location: index.php");
         }
     }
 }
